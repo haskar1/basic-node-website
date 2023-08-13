@@ -1,40 +1,25 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const path = require('path');
 
-const hostname = '127.0.0.1';
-const port = 8080;
+const app = express();
+const port = process.env.PORT || 8080;
 
-const server = http.createServer((req, res) => {
-  // const myURL = new URL(`http://${hostname}:${port}${req.url}`);
-
-  if (req.url === '/favicon.ico') {
-    res.writeHead(200, {'Content-Type': 'image/x-icon'});
-    return res.end();
-  }
-
-  res.writeHead(200, {'Content-Type': 'text/html'});
-
-  let fileName;
-  if (req.url === '/') {
-    fileName = 'index.html';
-  } 
-  else if (req.url === '/about') {
-    fileName = 'about.html';
-  }
-  else if (req.url === '/contact-me') {
-    fileName = 'contact-me.html';
-  }
-  else {
-    fileName = '404.html';
-  }
-
-  fs.readFile(fileName, (err, data) => {
-    if (err) console.log(err);
-    res.write(data);
-    return res.end();
-  })
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, '/about.html'));
+});
+
+app.get("/contact-me", (req, res) => {
+  res.sendFile(path.join(__dirname, '/contact-me.html'));
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '/404.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Listening on port ${port}!`);
 });
